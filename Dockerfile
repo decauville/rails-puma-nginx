@@ -1,26 +1,28 @@
 FROM ubuntu:14.04
 MAINTAINER Alican Erdogan <aerdogan07@gmail.com>
 
-# NGINX, GIT AND ZIP INSTALL
+# INSTALL NGINX, GIT AND ZIP
 RUN apt-get update && \
     apt-get install -y nginx zip git
 
-# RAILS INSTALL
+# INSTALL ESSENTIAL LIBRARIES
 RUN apt-get update && apt-get install -y git-core curl zlib1g-dev \
     build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev \
     sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev \
     python-software-properties libffi-dev libpq-dev
 
+# INSTALL RBENV
 RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build && \
     git clone https://github.com/rbenv/rbenv-gem-rehash.git ~/.rbenv/plugins/rbenv-gem-rehash
 
+## CONFIGURE PATH FOR RBENV
 ENV PATH /root/.rbenv/bin:/root/.rbenv/plugins/ruby-build/bin:/root/.rbenv/shims:$PATH
 
 RUN	rbenv install 2.2.3 && \
     rbenv global 2.2.3
 
-## CONFIGURE RUBY
+# INSTALL RAILS
 RUN gem install bundler --no-ri --no-rdoc && \
     gem install rails -v 4.2.4 --no-ri --no-rdoc && \
     rbenv rehash
@@ -40,6 +42,10 @@ ARG APP_URL=https://github.com/alicanerdogan/Rails4Sample.git
 ARG DATABASE_USER=postgres
 ARG DATABASE_PASSWORD=postgres
 ARG DATABASE_HOST=postgres_db
+
+# Required for Bundler Install Error issues
+ENV LANG="C.UTF-8"
+ENV LC_ALL="C.UTF-8"
 
 # APP DEPLOYMENT
 WORKDIR $APP_ROOT
